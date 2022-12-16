@@ -138,7 +138,7 @@ s.waitForBoot {
 	};);
 
 	~select_beat = {
-		~beat_to_play = ~beat_patterns[artist_B].choose;
+		~beat_to_play = ~beat_patterns[~artist_B].choose;
 		~artists[~artist_B].postln;
 	};
 
