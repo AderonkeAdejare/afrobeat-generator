@@ -82,11 +82,6 @@ s.waitForBoot {
 	~beat_to_play = ~beat_patterns[0].choose;
 
 
-
-
-
-
-
 	// GUI for user interaction
 	// close any windows that were open before to clean up screen space
 	Window.closeAll;
@@ -148,10 +143,10 @@ s.waitForBoot {
 		// postln statements are placeholders for functions that will choose which beat out of 2 from the given artists to play
 		/*if (choice == 0, {"Tiwa Savage".postln;});
 		if (choice == 1, {"Arya Starr".postln;});
-		if (choice == 2, {"WizKid".postln;});*/
+		if (choice == 2, {"WizKid".postln;});
+		check with Enoch if we can delete this*/
 		~beat_to_play = ~beat_patterns[choice].choose;
 		~artists[choice].postln;
-
 
 	};);
 
@@ -163,7 +158,19 @@ s.waitForBoot {
 	c = Scale.major.degrees;
 	c.postln;
 
+	~generateMelody = {
+		arg octave;
+			c = c + octave;
+			~i = [c[0], c[2], c[4]];
+			~iv = [c[3], c[5], c[0]];
+			~v = [c[4], c[6], c[1]];
+			// chord layer
+			~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, t.tempo);
+			~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, t.tempo );
+			~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, t.tempo);
 
+			Ppar([~bot, ~mid, ~top]);
+		};
 
 	~artist_melody = PopUpMenu(w, Rect(500, 50, 150, 30))
 	.items_(["Tiwa Savage", "Arya Starr", "WizKid"])
@@ -174,42 +181,29 @@ s.waitForBoot {
 		// get from item
 		choice = menu.value;
 		// postln statements are placeholders for functions that will choose which melody (out of 2?) from the given artists to play
-		if (choice == 0, {"Tiwa Savage".postln;
 
+		~chords = switch(choice,
+			0, {"Tiwa Savage".postln;
+				// probably do outside function & call here with octave parameters
+				~generateMelody.([72, 70, 79].choose);
+			},
+			1, {"Arya Starr".postln;
+				// probably do outside function & call here with octave parameters
+				~generateMelody.([60, 58, 67].choose);
 
-			~key = switch(~key_no,
-				0, {~key = ~key + 60}, // C Major !
-				1, {~key = ~key + 61}, // Db Major
-				2, {~key = ~key + 70}, // Bb Major !
-				3, {~key = ~key + 65}, // F Major
-				4, {~key = ~key + 67}, // G Major
-				5, {~key = ~key + 62}, // D Major
-				6, {~key = ~key + 69}, // A Major
-			);
-			c = c + 72;
-			~i = [c[0], c[2], c[4]];
-			~iv = [c[3], c[5], c[0]];
-			~v = [c[4], c[6], c[1]];
-			// chord layer
-			~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0]]).midicps );
-			~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1]]).midicps );
-			~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2]]).midicps);
+			},
+			2, {"WizKid".postln;
+				// probably do outside function & call here with octave parameters
+				~generateMelody.([48, 46, 55].choose);
 
-			Ppar([~bot, ~mid, ~top]).play;
-		});
-
-		if (choice == 1, {"Arya Starr".postln;});
-
-		if (choice == 2, {"WizKid".postln;});
-
-
+			}
+		);
 	};);
 
 	~artist_melody_label = StaticText(w, Rect(530, 80, 80, 20))
 	.string_("Melody")
 	.font_(Font("Monaco", 14))
 	.align_(\center);
-
 
 	~instructions = StaticText(w, Rect(20, 75, 200, 300))
 	.string_("Instructions: Use the slider to set the tempo. Pick a beat and a melody from the artist(s) you want to make a song in the style of. Hit Play!")
@@ -228,7 +222,7 @@ s.waitForBoot {
 		if (
 			obj.value == 1,
 			{   "playing".postln;
-				x = ~beat_to_play.play;
+				x = Ppar([~beat_to_play, ~chords]).play;
 				//x = Synth.new(\simple).register;
 			},
 			{x.stop;}
