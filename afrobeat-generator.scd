@@ -150,9 +150,10 @@ s.waitForBoot {
 			~iv = [c[3], c[5], c[0]];
 			~v = [c[4], c[6], c[1]];
 			// chord layer
-			~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, t.tempo);
-			~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, t.tempo );
-			~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, t.tempo);
+			x = [1,2,4].choose;
+			~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, x);
+			~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, x );
+			~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, x);
 
 			Ppar([~bot, ~mid, ~top]);
 		};
