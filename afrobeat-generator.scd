@@ -133,7 +133,7 @@ s.waitForBoot {
 		if (choice == 1, {"Arya Starr".postln;});
 		if (choice == 2, {"WizKid".postln;});
 		check with Enoch if we can delete this*/
-		
+
 
 	};);
 
@@ -167,23 +167,32 @@ s.waitForBoot {
 	.font_(Font("Monaco", 14))
 	.align_(\center);
 
+	~key_distribution = [
+		[Scale.major.degrees, Scale.minor.degrees, Scale.minor.degrees],
+		[Scale.major.degrees, Scale.minor.degrees, Scale.major.degrees,Scale.dorian.degrees,Scale.minor.degrees],
+		[Scale.major.degrees, Scale.major.degrees,Scale.minor.degrees,Scale.dorian.degrees, Scale.dorian.degrees]
+	];
+
 
 	~generateMelody = {
 		arg octave;
 
-		c = Scale.major.degrees;
-			c = c + octave;
-			~i = [c[0], c[2], c[4]];
-			~iv = [c[3], c[5], c[0]];
-			~v = [c[4], c[6], c[1]];
-			// chord layer
-			x = [1,2,4].choose;
-			~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, x);
-			~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, x );
-			~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, x);
+		//c = [Scale.major.degrees,Scale.major.degrees,Scale. .degrees, Scale.minor.degrees].choose;
+		c = ~key_distribution[~artist_M].choose;
+		c = c + octave;
+		~i = [c[0], c[2], c[4]];
+		~iv = [c[3], c[5], c[0]];
+		~v = [c[4], c[6], c[1]];
+		// chord layer
+		x = [1,2,2,4,4,4,4].choose;
+		x.postln;
+		~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, x);
+		~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, x );
+		~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, x);
 
-			Ppar([~bot, ~mid, ~top]);
-		};
+		Ppar([~bot, ~mid, ~top]);
+
+	};
 
 
 
@@ -223,10 +232,10 @@ s.waitForBoot {
 		arg obj;
 		if (
 			obj.value == 1,
-			{   
+			{
 				"playing".postln;
-				~select_beat;
-				~select_melody;
+				~select_beat.();
+				~select_melody.();
 				x = Ppar([~beat_to_play, ~chords]).play;
 				//x = Synth.new(\simple).register;
 			},
