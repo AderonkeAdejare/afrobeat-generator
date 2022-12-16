@@ -1,20 +1,5 @@
 (
 s.waitForBoot {
-
-	// synthdefs
-	// sample synthdef
-	SynthDef.new(\simple, {
-	arg freq = 440, rq = 0.2;
-	var sig;
-	sig = PinkNoise.ar(1!2);
-	sig = BPF.ar(
-		sig,
-		freq.lag(0.5), //.lag makes sound smooth & not pop
-		rq.lag(0.5),
-		1/rq.sqrt.lag(0.5)
-	);
-	Out.ar(0, sig);}).add;
-
 	//beats
 	// setting up samples
 	~kick = Buffer.read(s, "samples/kick.wav");
@@ -155,11 +140,11 @@ s.waitForBoot {
 	.font_(Font("Monaco", 14))
 	.align_(\center);
 
-	c = Scale.major.degrees;
-	c.postln;
 
 	~generateMelody = {
 		arg octave;
+
+		c = Scale.major.degrees;
 			c = c + octave;
 			~i = [c[0], c[2], c[4]];
 			~iv = [c[3], c[5], c[0]];
@@ -172,8 +157,11 @@ s.waitForBoot {
 			Ppar([~bot, ~mid, ~top]);
 		};
 
+
+
 	~artist_melody = PopUpMenu(w, Rect(500, 50, 150, 30))
-	.items_(["Tiwa Savage", "Arya Starr", "WizKid"])
+	.items_(~artists)
+	//.default_(~artists[0])
 	.font_(Font("Monaco", 14))
 	.action_({
 		arg menu;
@@ -181,23 +169,23 @@ s.waitForBoot {
 		// get from item
 		choice = menu.value;
 		// postln statements are placeholders for functions that will choose which melody (out of 2?) from the given artists to play
-
+		menu.item.postln;
 		~chords = switch(choice,
-			0, {"Tiwa Savage".postln;
-				// probably do outside function & call here with octave parameters
-				~generateMelody.([72, 70, 79].choose);
+			0, { // C, Bb, and G as default keys in different octaves for each artist
+				~notes = [72, 70, 79].choose;
+				~generateMelody.(~notes);
 			},
-			1, {"Arya Starr".postln;
-				// probably do outside function & call here with octave parameters
-				~generateMelody.([60, 58, 67].choose);
-
+			1, {
+				~notes = [60, 58, 67].choose;
+				~generateMelody.(~notes);
 			},
-			2, {"WizKid".postln;
-				// probably do outside function & call here with octave parameters
-				~generateMelody.([48, 46, 55].choose);
-
+			2, {
+				~notes = [48, 46, 55].choose;
+				~generateMelody.(~notes);
 			}
 		);
+		~notes.postln;
+
 	};);
 
 	~artist_melody_label = StaticText(w, Rect(530, 80, 80, 20))
@@ -230,19 +218,3 @@ s.waitForBoot {
 
 	);
 })
-
-(
-SynthDef(\tiwa, {
-})
-
-c = Scale.major.degrees;
-c.postln;
-Pbind(\freq, c).play;
-
-~i = [c[0], c[2], c[4]];
-~iv = [c[3], c[5], c[0]];
-~v = [c[4], c[6], c[1]];
-)
-
-().play
-Pbind(\freq, Prand([300, 500, 231.2, 399.2], inf), \dur, 0.1).play;
