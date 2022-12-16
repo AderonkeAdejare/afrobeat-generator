@@ -140,11 +140,12 @@ s.waitForBoot {
 	.font_(Font("Monaco", 14))
 	.align_(\center);
 
+	// define scales for melody & lyric generation
+	c = Scale.major.degrees;
 
 	~generateMelody = {
 		arg octave;
 
-		c = Scale.major.degrees;
 			c = c + octave;
 			~i = [c[0], c[2], c[4]];
 			~iv = [c[3], c[5], c[0]];
@@ -157,6 +158,48 @@ s.waitForBoot {
 			Ppar([~bot, ~mid, ~top]);
 		};
 
+	// Mealy Machine to generate notes that on that could be pitches of lyrics
+	n = [];
+	~genNState = {
+		arg current;
+		switch(current,
+			0, {
+				// choose note to play in this state
+				n = n.add([c[0], c[3], c[4]].choose);
+
+				// choose next state
+				~states.wchoose([0.5, 0.5, 0.0]);
+
+			},
+			1, {
+				n = n.add([c[1], c[4], c[5]].choose);
+				~states.wchoose([0.45, 0.1, 0.45]);
+			},
+			2, {
+				n = n.add([c[2], c[5], c[6]].choose);
+				~states.wchoose([0.45, 0.45, 0.1]);
+			}
+		);};
+// should i add n to ~not array? then it plays ~not
+	~generateLyrics = {
+		n = [];
+		~states = [0, 1, 2];
+		// start state is 0
+		~c_state = ~states[0];
+		("Current:" + ~c_state).postln;
+
+		~n_state = ~genNState.(~c_state); // printing out n
+		("Next:" + ~n_state).postln;
+		1024.do{
+		//n.postln;
+		~c_state = ~n_state;
+		~n_state = ~genNState.(~c_state);
+		};
+		n = n + 60;
+		Pbind(\freq, Pseq(n, inf).midicps, \dur, 0.5).play;
+	};
+
+	~generateLyrics.();
 
 
 	~artist_melody = PopUpMenu(w, Rect(500, 50, 150, 30))
@@ -193,7 +236,10 @@ s.waitForBoot {
 	.font_(Font("Monaco", 14))
 	.align_(\center);
 
-	~instructions = StaticText(w, Rect(20, 75, 200, 300))
+
+
+
+	~instructions = StaticText(w, Rect(20, 75, 300, 300))
 	.string_("Instructions: Use the slider to set the tempo. Pick a beat and a melody from the artist(s) you want to make a song in the style of. Hit Play!")
 	.font_(Font("Monaco", 14))
 	.align_(\center);
@@ -210,10 +256,12 @@ s.waitForBoot {
 		if (
 			obj.value == 1,
 			{   "playing".postln;
-				x = Ppar([~beat_to_play, ~chords]).play;
+				x = Ppar([~beat_to_play, ~chords, n]).play;
 				//x = Synth.new(\simple).register;
 			},
-			{x.stop;}
+			{x.stop;
+			n.newClear ;
+			}
 	); }
 
 	);
