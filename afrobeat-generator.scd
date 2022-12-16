@@ -17,6 +17,9 @@ s.waitForBoot {
 		)
 	}).add;
 
+	~artist_B = 0;
+	~artist_M = 0;
+
 
 	~generatePattern = {
 		arg pattern, sound, bpm;
@@ -130,10 +133,34 @@ s.waitForBoot {
 		if (choice == 1, {"Arya Starr".postln;});
 		if (choice == 2, {"WizKid".postln;});
 		check with Enoch if we can delete this*/
-		~beat_to_play = ~beat_patterns[choice].choose;
-		~artists[choice].postln;
+		
 
 	};);
+
+	~select_beat = {
+		~beat_to_play = ~beat_patterns[artist_B].choose;
+		~artists[~artist_B].postln;
+	};
+
+	~chords;
+
+	~select_melody = {
+		~chords = switch(~artist_M,
+			0, { // C, Bb, and G as default keys in different octaves for each artist
+				~notes = [72, 70, 79].choose;
+				~generateMelody.(~notes);
+			},
+			1, {
+				~notes = [60, 58, 67].choose;
+				~generateMelody.(~notes);
+			},
+			2, {
+				~notes = [48, 46, 55].choose;
+				~generateMelody.(~notes);
+			}
+		);
+		~notes.postln;
+	};
 
 	~artist_beat_label = StaticText(w, Rect(365, 80, 80, 20))
 	.string_("Beat")
@@ -171,21 +198,7 @@ s.waitForBoot {
 		choice = menu.value;
 		// postln statements are placeholders for functions that will choose which melody (out of 2?) from the given artists to play
 		menu.item.postln;
-		~chords = switch(choice,
-			0, { // C, Bb, and G as default keys in different octaves for each artist
-				~notes = [72, 70, 79].choose;
-				~generateMelody.(~notes);
-			},
-			1, {
-				~notes = [60, 58, 67].choose;
-				~generateMelody.(~notes);
-			},
-			2, {
-				~notes = [48, 46, 55].choose;
-				~generateMelody.(~notes);
-			}
-		);
-		~notes.postln;
+		~artist_M = choice;
 
 	};);
 
@@ -210,7 +223,10 @@ s.waitForBoot {
 		arg obj;
 		if (
 			obj.value == 1,
-			{   "playing".postln;
+			{   
+				"playing".postln;
+				~select_beat;
+				~select_melody;
 				x = Ppar([~beat_to_play, ~chords]).play;
 				//x = Synth.new(\simple).register;
 			},
