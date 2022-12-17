@@ -162,16 +162,6 @@ s.waitForBoot {
 
 	~generateChord = {
 		arg octave;
-			c = c + octave;
-			~i = [c[0], c[2], c[4]];
-			~iv = [c[3], c[5], c[0]];
-			~v = [c[4], c[6], c[1]];
-			// chord layer
-			~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, t.tempo);
-			~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, t.tempo );
-			~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, t.tempo);
-
-		//c = [Scale.major.degrees,Scale.major.degrees,Scale. .degrees, Scale.minor.degrees].choose;
 		c = ~key_distribution[~artist_M].choose;
 		c = c + octave;
 		~i = [c[0], c[2], c[4]];
@@ -219,12 +209,12 @@ s.waitForBoot {
 
 		~n_state = ~genNState.(~c_state); // printing out n
 		//("Next:" + ~n_state).postln;
-		1024.do{
+		128.do{
 			~c_state = ~n_state;
 			~n_state = ~genNState.(~c_state);
 		};
 		("Note Scale Degrees:" + n).postln;
-		n = n + octave;
+		// n = n + octave;
 		("Notes:" + n).postln;
 		//Pbind(\freq, Pseq(n, inf).midicps, \dur, 0.5).play;
 	};
