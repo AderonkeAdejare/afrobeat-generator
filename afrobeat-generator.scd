@@ -2,13 +2,15 @@
 s.waitForBoot {
 	//beats
 	// setting up samples
-	~kick = Buffer.read(s, ("samples/kick.wav").resolveRelative);
-	~ohat = Buffer.read(s, ("samples/ohat.wav").resolveRelative);
-	~chat = Buffer.read(s, ("samples/chat.wav").resolveRelative);
-	~clap = Buffer.read(s, ("samples/clap.wav").resolveRelative);
-	~snar = Buffer.read(s, ("samples/snar.wav").resolveRelative);
-	~perc = Buffer.read(s, ("samples/perc.wav").resolveRelative);
-	~rest = Buffer.read(s, ("samples/rest.wav").resolveRelative);
+	b = [\kick, \ohat, \chat, \clap, \snar, \perc, \rest].collect{|val| Buffer.read(s,(val++".wav").resolveRelative) };
+	~kick = b[0]; // Buffer.read(s, ("samples/kick.wav").resolveRelative);
+	~ohat = b[1]; //Buffer.read(s, "samples/ohat.wav");
+	~chat = b[2]; //Buffer.read(s, "samples/chat.wav");
+	~clap = b[3]; //Buffer.read(s, "samples/clap.wav");
+	~snar = b[4]; //Buffer.read(s, "samples/snar.wav");
+	~perc = b[5]; //Buffer.read(s, "samples/perc.wav");
+	~rest = b[6]; //Buffer.read(s, "samples/rest.wav");
+
 
 	// sample player src: https://truthindustri.es/supercollider/2019/01/04/supercollider-house-drums.html
 	SynthDef(\samplePlayer,{ arg out = 0, bufnum, amp;
