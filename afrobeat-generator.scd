@@ -2,13 +2,13 @@
 s.waitForBoot {
 	//beats
 	// setting up samples
-	~kick = Buffer.read(s, "samples/kick.wav");
-	~ohat = Buffer.read(s, "samples/ohat.wav");
-	~chat = Buffer.read(s, "samples/chat.wav");
-	~clap = Buffer.read(s, "samples/clap.wav");
-	~snar = Buffer.read(s, "samples/snar.wav");
-	~perc = Buffer.read(s, "samples/perc.wav");
-	~rest = Buffer.read(s, "samples/rest.wav");
+	~kick = Buffer.read(s, ("samples/kick.wav").resolveRelative);
+	~ohat = Buffer.read(s, ("samples/ohat.wav").resolveRelative);
+	~chat = Buffer.read(s, ("samples/chat.wav").resolveRelative);
+	~clap = Buffer.read(s, ("samples/clap.wav").resolveRelative);
+	~snar = Buffer.read(s, ("samples/snar.wav").resolveRelative);
+	~perc = Buffer.read(s, ("samples/perc.wav").resolveRelative);
+	~rest = Buffer.read(s, ("samples/rest.wav").resolveRelative);
 
 	// sample player src: https://truthindustri.es/supercollider/2019/01/04/supercollider-house-drums.html
 	SynthDef(\samplePlayer,{ arg out = 0, bufnum, amp;
@@ -124,6 +124,7 @@ s.waitForBoot {
 		var choice;
 		// get from item
 		choice = menu.value;
+		~artist_B = choice;
 
 	};);
 
@@ -136,13 +137,13 @@ s.waitForBoot {
 
 
 	~select_melody = {
-		~chords = switch(~artist_M,
+		~artist_switch = switch(~artist_M,
 			// C, Bb, and G as default keys in different octaves for each artist
 			0, {~notes = [72, 70, 79].choose;},
 			1, {~notes = [60, 58, 67].choose;},
 			2, {~notes = [48, 46, 55].choose;}
 		);
-		~generateChord.(~notes);
+			~chords = ~generateChord.(~notes);
 		~notes.postln;
 	};
 
@@ -240,7 +241,7 @@ s.waitForBoot {
 		choice = menu.value;
 		menu.item.postln;
 		~artist_M = choice;
-		~generateLyrics.(~notes);
+
 
 	};);
 
@@ -269,7 +270,8 @@ s.waitForBoot {
 			{   "playing".postln;
 				~select_beat.();
 				~select_melody.();
-				x = Ppar([~beat_to_play, ~chords, n]).play;
+				~generateLyrics.(~notes);
+				x = Ppar([~beat_to_play, ~chords]).play;
 			},
 			{x.stop;}
 	); }
