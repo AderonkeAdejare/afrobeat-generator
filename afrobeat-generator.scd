@@ -3,13 +3,13 @@ s.waitForBoot {
 	//beats
 	// setting up samples
 	b = [\kick, \ohat, \chat, \clap, \snar, \perc, \rest].collect{|val| Buffer.read(s,(val++".wav").resolveRelative) };
-	~kick = b[0]; // Buffer.read(s, ("samples/kick.wav").resolveRelative);
-	~ohat = b[1]; //Buffer.read(s, "samples/ohat.wav");
-	~chat = b[2]; //Buffer.read(s, "samples/chat.wav");
-	~clap = b[3]; //Buffer.read(s, "samples/clap.wav");
-	~snar = b[4]; //Buffer.read(s, "samples/snar.wav");
-	~perc = b[5]; //Buffer.read(s, "samples/perc.wav");
-	~rest = b[6]; //Buffer.read(s, "samples/rest.wav");
+	~kick = b[0]; 
+	~ohat = b[1];
+	~chat = b[2]; 
+	~clap = b[3];
+	~snar = b[4]; 
+	~perc = b[5];
+	~rest = b[6];
 
 
 	// sample player src: https://truthindustri.es/supercollider/2019/01/04/supercollider-house-drums.html
@@ -22,7 +22,7 @@ s.waitForBoot {
 	~artist_B = 0;
 	~artist_M = 0;
 
-
+	//
 	~generatePattern = {
 		arg pattern, sound, bpm;
 		var output;
@@ -54,19 +54,33 @@ s.waitForBoot {
 	~d = ~generatePattern.([1,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0], ~chat, 105);
 	~tiwa_beat_patterns = List[Ppar([~c, ~d], inf)];
 
-	//rush reference 100 bpm
-	~a = ~generatePattern.([1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,0], ~snar, 100);
+	// essence 104 bpm
+	~a = ~generatePattern.([0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], ~perc, 104);
+	~b = ~generatePattern.([1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0, 1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0], ~kick, 104);
+	~c = ~generatePattern.([0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0, 0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0], ~snar, 104);
+	~d = ~generatePattern.([0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0], ~chat, 104);
+	~wizk_beat_patterns.add(Ppar([~a,~b,~c], inf));
+
+	// koroba 104
+	~a = ~generatePattern.([0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0], ~chat, 104);
+	~b = ~generatePattern.([1,0,0,1,0,0,1,0,0,0,1,0,1,0,0,0], ~snar, 104); //good
+	~c = ~generatePattern.([1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1], ~clap, 104); //good
+	~d = ~generatePattern.([1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], ~kick, 104);
+	~tiwa_beat_patterns.add(Ppar([~a, ~b, ~d], inf));
+
+	//rush down reference 100 bpm
+	~a = ~generatePattern.([1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,0], ~chat, 100);
 	~b = ~generatePattern.([1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0], ~kick, 100);
 	~c = ~generatePattern.([0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0], ~ohat, 100);
 	~d = ~generatePattern.([1,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0], ~chat, 100);
 	~arya_beat_patterns = List[Ppar([~a, ~b, ~c], inf)];
 
 	//rush down reference 100 bpm
-	~a = ~generatePattern.([1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,0], ~chat, 107);
-	~b = ~generatePattern.([1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0], ~kick, 107);
-	~c = ~generatePattern.([0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0], ~ohat, 107);
-	~d = ~generatePattern.([1,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0], ~chat, 107);
-	~arya_beat_patterns = List[Ppar([~a, ~b, ~c], inf)];
+	~a = ~generatePattern.([1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0], ~chat, 100);
+	~b = ~generatePattern.([1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0], ~kick, 100);
+	~c = ~generatePattern.([0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0], ~snar, 100);
+	~d = ~generatePattern.([0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0], ~perc, 100);
+	~arya_beat_patterns.add(Ppar([~a, ~b, ~c, ~d], inf));
 
 	~beat_patterns = List[~tiwa_beat_patterns, ~arya_beat_patterns, ~wizk_beat_patterns];
 	~beat_to_play = ~beat_patterns[0].choose;
@@ -137,7 +151,7 @@ s.waitForBoot {
 	};
 
 	~chords;
-
+	//thanks for watching :)
 
 	~select_melody = {
 		~artist_switch = switch(~artist_M,
@@ -156,22 +170,22 @@ s.waitForBoot {
 	.align_(\center);
 
 	// define scales for melody & lyric generation
-	c = Scale.major.degrees;
-	~key_distribution = [
-		[Scale.major.degrees, Scale.minor.degrees, Scale.minor.degrees],
-		[Scale.major.degrees, Scale.minor.degrees, Scale.major.degrees,Scale.dorian.degrees,Scale.minor.degrees],
-		[Scale.major.degrees, Scale.major.degrees,Scale.minor.degrees,Scale.dorian.degrees, Scale.dorian.degrees]
-	];
+	~key_distribution = Scale.major.degrees;
 
 	~generateChord = {
 		arg octave;
-		c = ~key_distribution[~artist_M].choose;
+		~key_distribution = [
+			[Scale.major.degrees, Scale.minor.degrees].wchoose([1, 2]),
+			[Scale.major.degrees, Scale.minor.degrees, Scale.dorian.degrees].wchoose([2, 2, 1]),
+			[Scale.major.degrees, Scale.minor.degrees,Scale.dorian.degrees].wchoose([2, 1, 2])
+		];
+		c = ~key_distribution[~artist_M];
 		c = c + octave;
 		~i = [c[0], c[2], c[4]];
 		~iv = [c[3], c[5], c[0]];
 		~v = [c[4], c[6], c[1]];
 		// chord layer
-		x = [1,2,2,4,4,4,4].choose;
+		x = [1,2,4].wchoose([1,3,6]);
 		//x.postln;
 		~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, x);
 		~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, x );
