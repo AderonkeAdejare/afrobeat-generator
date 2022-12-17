@@ -17,6 +17,9 @@ s.waitForBoot {
 		)
 	}).add;
 
+	~artist_B = 0;
+	~artist_M = 0;
+
 
 	~generatePattern = {
 		arg pattern, sound, bpm;
@@ -130,10 +133,34 @@ s.waitForBoot {
 		if (choice == 1, {"Arya Starr".postln;});
 		if (choice == 2, {"WizKid".postln;});
 		check with Enoch if we can delete this*/
-		~beat_to_play = ~beat_patterns[choice].choose;
-		~artists[choice].postln;
+
 
 	};);
+
+	~select_beat = {
+		~beat_to_play = ~beat_patterns[~artist_B].choose;
+		~artists[~artist_B].postln;
+	};
+
+	~chords;
+
+	~select_melody = {
+		~chords = switch(~artist_M,
+			0, { // C, Bb, and G as default keys in different octaves for each artist
+				~notes = [72, 70, 79].choose;
+				~generateMelody.(~notes);
+			},
+			1, {
+				~notes = [60, 58, 67].choose;
+				~generateMelody.(~notes);
+			},
+			2, {
+				~notes = [48, 46, 55].choose;
+				~generateMelody.(~notes);
+			}
+		);
+		~notes.postln;
+	};
 
 	~artist_beat_label = StaticText(w, Rect(365, 80, 80, 20))
 	.string_("Beat")
@@ -142,10 +169,14 @@ s.waitForBoot {
 
 	// define scales for melody & lyric generation
 	c = Scale.major.degrees;
+	~key_distribution = [
+		[Scale.major.degrees, Scale.minor.degrees, Scale.minor.degrees],
+		[Scale.major.degrees, Scale.minor.degrees, Scale.major.degrees,Scale.dorian.degrees,Scale.minor.degrees],
+		[Scale.major.degrees, Scale.major.degrees,Scale.minor.degrees,Scale.dorian.degrees, Scale.dorian.degrees]
+	];
 
 	~generateMelody = {
 		arg octave;
-
 			c = c + octave;
 			~i = [c[0], c[2], c[4]];
 			~iv = [c[3], c[5], c[0]];
@@ -155,8 +186,21 @@ s.waitForBoot {
 			~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, t.tempo );
 			~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, t.tempo);
 
-			Ppar([~bot, ~mid, ~top]);
-		};
+		//c = [Scale.major.degrees,Scale.major.degrees,Scale. .degrees, Scale.minor.degrees].choose;
+		c = ~key_distribution[~artist_M].choose;
+		c = c + octave;
+		~i = [c[0], c[2], c[4]];
+		~iv = [c[3], c[5], c[0]];
+		~v = [c[4], c[6], c[1]];
+		// chord layer
+		x = [1,2,2,4,4,4,4].choose;
+		x.postln;
+		~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, x);
+		~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, x );
+		~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, x);
+
+		Ppar([~bot, ~mid, ~top]);
+	};
 
 	// Mealy Machine to generate notes that on that could be pitches of lyrics
 	n = [];
@@ -180,7 +224,6 @@ s.waitForBoot {
 				~states.wchoose([0.45, 0.45, 0.1]);
 			}
 		);};
-// should i add n to ~not array? then it plays ~not
 	~generateLyrics = {
 		n = [];
 		~states = [0, 1, 2];
@@ -196,7 +239,7 @@ s.waitForBoot {
 		~n_state = ~genNState.(~c_state);
 		};
 		n = n + 60;
-		Pbind(\freq, Pseq(n, inf).midicps, \dur, 0.5).play;
+		//Pbind(\freq, Pseq(n, inf).midicps, \dur, 0.5).play;
 	};
 
 	~generateLyrics.();
@@ -204,7 +247,6 @@ s.waitForBoot {
 
 	~artist_melody = PopUpMenu(w, Rect(500, 50, 150, 30))
 	.items_(~artists)
-	//.default_(~artists[0])
 	.font_(Font("Monaco", 14))
 	.action_({
 		arg menu;
@@ -213,21 +255,7 @@ s.waitForBoot {
 		choice = menu.value;
 		// postln statements are placeholders for functions that will choose which melody (out of 2?) from the given artists to play
 		menu.item.postln;
-		~chords = switch(choice,
-			0, { // C, Bb, and G as default keys in different octaves for each artist
-				~notes = [72, 70, 79].choose;
-				~generateMelody.(~notes);
-			},
-			1, {
-				~notes = [60, 58, 67].choose;
-				~generateMelody.(~notes);
-			},
-			2, {
-				~notes = [48, 46, 55].choose;
-				~generateMelody.(~notes);
-			}
-		);
-		~notes.postln;
+		~artist_M = choice;
 
 	};);
 
@@ -235,8 +263,6 @@ s.waitForBoot {
 	.string_("Melody")
 	.font_(Font("Monaco", 14))
 	.align_(\center);
-
-
 
 
 	~instructions = StaticText(w, Rect(20, 75, 300, 300))
@@ -256,12 +282,11 @@ s.waitForBoot {
 		if (
 			obj.value == 1,
 			{   "playing".postln;
-				x = Ppar([~beat_to_play, ~chords, n]).play;
-				//x = Synth.new(\simple).register;
+				~select_beat.();
+				~select_melody.();
+				x = Ppar([~beat_to_play, ~chords]).play;
 			},
-			{x.stop;
-			n.newClear ;
-			}
+			{x.stop;}
 	); }
 
 	);
