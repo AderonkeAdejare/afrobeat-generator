@@ -36,7 +36,7 @@ s.waitForBoot {
 				{ output.add(sound)}   // false function
 			)
 		});
-		Pseq(output, 4);
+		Pseq(output, inf);
 		result = Pbind(\instrument, \samplePlayer, \bufnum, Pseq(output), \dur, 0.25);
 	};
 
@@ -45,28 +45,28 @@ s.waitForBoot {
 	~b = ~generatePattern.([1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], ~kick, 101);
 	~c = ~generatePattern.([0,0,0,1,0,0,1,0,0,0,0,1,0,0,1,0], ~clap, 101);
 	~d = ~generatePattern.([1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0], ~chat, 101);
-	~wizk_beat_patterns = List[Ppar([~a,~b,~c, ~d], 4)];
+	~wizk_beat_patterns = List[Ppar([~a,~b,~c, ~d], inf)];
 
 	//ma lo reference 105 bpm
 	~a = ~generatePattern.([1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], ~perc, 105);
 	~b = ~generatePattern.([1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], ~kick, 105);
 	~c = ~generatePattern.([1,0,0,1,0,0,1,0,0,0,1,0,1,0,0,0], ~clap, 105);
 	~d = ~generatePattern.([1,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0], ~chat, 105);
-	~tiwa_beat_patterns = List[Ppar([~c, ~d], 4)];
+	~tiwa_beat_patterns = List[Ppar([~c, ~d], inf)];
 
 	//rush reference 100 bpm
 	~a = ~generatePattern.([1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,0], ~snar, 100);
 	~b = ~generatePattern.([1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0], ~kick, 100);
 	~c = ~generatePattern.([0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0], ~ohat, 100);
 	~d = ~generatePattern.([1,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0], ~chat, 100);
-	~arya_beat_patterns = List[Ppar([~a, ~b, ~c], 4)];
+	~arya_beat_patterns = List[Ppar([~a, ~b, ~c], inf)];
 
-	//calm down reference 107 bpm
+	//rush down reference 100 bpm
 	~a = ~generatePattern.([1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,0], ~chat, 107);
 	~b = ~generatePattern.([1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0], ~kick, 107);
 	~c = ~generatePattern.([0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0], ~ohat, 107);
 	~d = ~generatePattern.([1,0,0,0,0,0,1,0,1,0,0,0,1,0,1,0], ~chat, 107);
-	~arya_beat_patterns = List[Ppar([~a, ~b, ~c], 4)];
+	~arya_beat_patterns = List[Ppar([~a, ~b, ~c], inf)];
 
 	~beat_patterns = List[~tiwa_beat_patterns, ~arya_beat_patterns, ~wizk_beat_patterns];
 	~beat_to_play = ~beat_patterns[0].choose;
@@ -87,6 +87,7 @@ s.waitForBoot {
 	~bpm = Slider.new(w.view, Rect.new(20, 50, 150, 30))
 	.background_(Color(0.8, 0.8, 0.8))
 	.thumbSize_(20)
+	.value_(0)
 	.action_({
 		arg obj;
 		var cf;
@@ -218,7 +219,9 @@ s.waitForBoot {
 		("Note Scale Degrees:" + n).postln;
 		// n = n + octave;
 		("Notes:" + n).postln;
-		//Pbind(\freq, Pseq(n, inf).midicps, \dur, 0.5).play;
+		~ret = Ppar([Pseq([~generatePattern.([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], ~rest)], 8)]);
+
+		Pseq([~ret, Pbind(\freq, Pseq(n, inf).midicps, \dur, 0.5)], 4);
 	};
 
 
@@ -262,10 +265,16 @@ s.waitForBoot {
 			{   "playing".postln;
 				~select_beat.();
 				~select_melody.();
-				~generateLyrics.(~notes);
-				x = Ppar([~beat_to_play, ~chords]).play;
+				~mel = ~generateLyrics.(~notes);
+				r = Recorder.new(s);
+				r.record;
+				x = Ppar([~beat_to_play, ~chords, ~mel]).play;
 			},
-			{x.stop;}
+			{
+				x.stop;
+				r.stopRecording;
+			}
+
 	); }
 
 	);
