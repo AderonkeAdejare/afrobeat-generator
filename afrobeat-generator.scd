@@ -73,9 +73,10 @@ s.waitForBoot {
 	// GUI for user interaction
 	// close any windows that were open before to clean up screen space
 	Window.closeAll;
+	// creates new window
 	w = Window.new("Afrobeats Generator", Rect(
 	Window.screenBounds.width/4,
-	Window.screenBounds.height/2, 750, 300)).front;//.alwaysOnTop_(true);
+	Window.screenBounds.height/2, 750, 300)).front;
 
 	// creates TempoClock
 	t = TempoClock;
@@ -87,11 +88,10 @@ s.waitForBoot {
 	.action_({
 		arg obj;
 		var cf;
-		cf = obj.value.linlin(0,1,60,200); //.linexp(0, 1, 60, 200); //.postln;
-		~number_box.value_(cf); //.linexp(0,1,60,200)
+		cf = obj.value.linlin(0,1,60,200);
+		~number_box.value_(cf);
 		// add function for grabbing bpm
 		t.tempo = cf/60;
-		//t.tempo.postln;
 	});
 	t.tempo;
 
@@ -124,16 +124,6 @@ s.waitForBoot {
 		var choice;
 		// get from item
 		choice = menu.value;
-		//~artists = [menu.value, menu.item];
-		//~artists.postln;
-
-		// if item == "Tiwa Savage" then select from beat that is closest to bpm
-		// postln statements are placeholders for functions that will choose which beat out of 2 from the given artists to play
-		/*if (choice == 0, {"Tiwa Savage".postln;});
-		if (choice == 1, {"Arya Starr".postln;});
-		if (choice == 2, {"WizKid".postln;});
-		check with Enoch if we can delete this*/
-
 
 	};);
 
@@ -144,21 +134,15 @@ s.waitForBoot {
 
 	~chords;
 
+
 	~select_melody = {
 		~chords = switch(~artist_M,
-			0, { // C, Bb, and G as default keys in different octaves for each artist
-				~notes = [72, 70, 79].choose;
-				~generateMelody.(~notes);
-			},
-			1, {
-				~notes = [60, 58, 67].choose;
-				~generateMelody.(~notes);
-			},
-			2, {
-				~notes = [48, 46, 55].choose;
-				~generateMelody.(~notes);
-			}
+			// C, Bb, and G as default keys in different octaves for each artist
+			0, {~notes = [72, 70, 79].choose;},
+			1, {~notes = [60, 58, 67].choose;},
+			2, {~notes = [48, 46, 55].choose;}
 		);
+		~generateChord.(~notes);
 		~notes.postln;
 	};
 
@@ -175,7 +159,7 @@ s.waitForBoot {
 		[Scale.major.degrees, Scale.major.degrees,Scale.minor.degrees,Scale.dorian.degrees, Scale.dorian.degrees]
 	];
 
-	~generateMelody = {
+	~generateChord = {
 		arg octave;
 			c = c + octave;
 			~i = [c[0], c[2], c[4]];
@@ -194,7 +178,7 @@ s.waitForBoot {
 		~v = [c[4], c[6], c[1]];
 		// chord layer
 		x = [1,2,2,4,4,4,4].choose;
-		x.postln;
+		//x.postln;
 		~bot = Pbind(\freq, Pseq([~i[0], ~iv[0], ~v[0], ~i[0]], inf).midicps, \dur, x);
 		~mid = Pbind(\freq, Pseq([~i[1], ~iv[1], ~v[1], ~i[1]], inf).midicps, \dur, x );
 		~top = Pbind(\freq, Pseq([~i[2], ~iv[2], ~v[2], ~i[2]], inf).midicps, \dur, x);
@@ -210,10 +194,8 @@ s.waitForBoot {
 			0, {
 				// choose note to play in this state
 				n = n.add([c[0], c[3], c[4]].choose);
-
 				// choose next state
 				~states.wchoose([0.5, 0.5, 0.0]);
-
 			},
 			1, {
 				n = n.add([c[1], c[4], c[5]].choose);
@@ -223,26 +205,29 @@ s.waitForBoot {
 				n = n.add([c[2], c[5], c[6]].choose);
 				~states.wchoose([0.45, 0.45, 0.1]);
 			}
-		);};
+		);
+
+	};
 	~generateLyrics = {
+		arg octave;
 		n = [];
 		~states = [0, 1, 2];
 		// start state is 0
 		~c_state = ~states[0];
-		("Current:" + ~c_state).postln;
+		//("Current:" + ~c_state).postln;
 
 		~n_state = ~genNState.(~c_state); // printing out n
-		("Next:" + ~n_state).postln;
+		//("Next:" + ~n_state).postln;
 		1024.do{
-		//n.postln;
-		~c_state = ~n_state;
-		~n_state = ~genNState.(~c_state);
+			~c_state = ~n_state;
+			~n_state = ~genNState.(~c_state);
 		};
-		n = n + 60;
+		("Note Scale Degrees:" + n).postln;
+		n = n + octave;
+		("Notes:" + n).postln;
 		//Pbind(\freq, Pseq(n, inf).midicps, \dur, 0.5).play;
 	};
 
-	~generateLyrics.();
 
 
 	~artist_melody = PopUpMenu(w, Rect(500, 50, 150, 30))
@@ -253,9 +238,9 @@ s.waitForBoot {
 		var choice;
 		// get from item
 		choice = menu.value;
-		// postln statements are placeholders for functions that will choose which melody (out of 2?) from the given artists to play
 		menu.item.postln;
 		~artist_M = choice;
+		~generateLyrics.(~notes);
 
 	};);
 
@@ -284,7 +269,7 @@ s.waitForBoot {
 			{   "playing".postln;
 				~select_beat.();
 				~select_melody.();
-				x = Ppar([~beat_to_play, ~chords]).play;
+				x = Ppar([~beat_to_play, ~chords, n]).play;
 			},
 			{x.stop;}
 	); }
