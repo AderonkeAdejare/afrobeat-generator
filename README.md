@@ -1,14 +1,12 @@
-# afrobeat-generator
-## Created by Aderonke Adejare & Enoch Omale
-
-Instructions: Use the slider to set the tempo. Pick a beat and a melody from the artist(s) you want to make a song in the style of. Hit Play!
 
 # Afrobeats Generator
+### Created by Aderonke Adejare & Enoch Omale
 
 Inspired by our Nigerian culture, we created a program that generates songs based on Afrobeats artists. Afrobeats is a genre that is growing in popularity across the world. Originating from Nigeria as an evolution of 1970s and ‘80s Afrobeat (without the s) music, Afrobeats focuses combining traditional Nigerian drum beats with modern hip-hop beats.
 
 Our Program, written in SuperCollider, is an easy-to-use generator of Afrobeats instrumentals in a small selection of styles inspired by songs from three of the most popular Afrobeats artists today: WizKid, Arya Starr, and Tiwa Savage. To use it, simply select the names of the artists whose sound you would like to mimic, a tempo, and then hit play to hear a unique piece of African music. Hitting “Stop” stops the music and hitting “Save” saves it in a file (in the default SuperCollider location) for later listening.
 
+Aderonke: I created the GUI, the chord layer, and the lyric layer.
 
 ## GUI
 
@@ -184,9 +182,3 @@ play action:
 	);
 
 ```
-
-# Demo Video & Song
-
-(audio not captured with video, but head to the our GitHub link above to download and test yourself)
-
-below is clip of the UI being interacted with and some output musical pieces.
