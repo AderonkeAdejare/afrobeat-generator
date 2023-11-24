@@ -1,13 +1,16 @@
 (
+Server.default.options.numInputBusChannels=0;
+s.boot;
+
 s.waitForBoot {
 	//beats
 	// setting up samples
 	b = [\kick, \ohat, \chat, \clap, \snar, \perc, \rest].collect{|val| Buffer.read(s,(val++".wav").resolveRelative) };
-	~kick = b[0]; 
+	~kick = b[0];
 	~ohat = b[1];
-	~chat = b[2]; 
+	~chat = b[2];
 	~clap = b[3];
-	~snar = b[4]; 
+	~snar = b[4];
 	~perc = b[5];
 	~rest = b[6];
 
